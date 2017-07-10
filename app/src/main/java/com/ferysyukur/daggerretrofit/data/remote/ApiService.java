@@ -19,8 +19,11 @@ import rx.Observable;
 
 public interface ApiService {
 
-    @GET("discover/movie")
+    @GET("movie/top_rated")
     Observable<MovieResponse> getTopRatedMovies(@Query("api_key") String apiKey);
+
+    @GET("movie/popular")
+    Observable<MovieResponse> getPopularMovies(@Query("api_key") String apiKey);
 
     @GET("movie/{id}")
     Observable<MovieDetail> getMovieDetails(@Path("id") int id, @Query("api_key") String apiKey);

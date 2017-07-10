@@ -47,8 +47,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     public void onBindViewHolder(ViewHolder holder, int position) {
         Movie mov = movies.get(position);
         holder.title.setText(mov.getTitle());
-        holder.subtitle.setText(mov.getReleaseDate());
-        holder.desc.setText(mov.getOverview());
+//        holder.subtitle.setText(mov.getReleaseDate());
+//        holder.desc.setText(mov.getOverview());
         holder.rating.setText(mov.getVoteAverage().toString());
         Glide.with(context).load(BuildConfig.BASE_URL_IMG+mov.getPosterPath())
                 .thumbnail(0.5f)
@@ -73,11 +73,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         @BindView(R.id.title)
         TextView title;
 
-        @BindView(R.id.subtitle)
-        TextView subtitle;
-
-        @BindView(R.id.description)
-        TextView desc;
+//        @BindView(R.id.subtitle)
+//        TextView subtitle;
+//
+//        @BindView(R.id.description)
+//        TextView desc;
 
         @BindView(R.id.rating)
         TextView rating;

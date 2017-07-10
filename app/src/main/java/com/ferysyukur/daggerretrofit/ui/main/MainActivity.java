@@ -3,9 +3,13 @@ package com.ferysyukur.daggerretrofit.ui.main;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -53,11 +57,44 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
         ButterKnife.bind(this);
 
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+
+        ViewPopularMovies();
+    }
+
+    public void ViewPopularMovies(){
         ((App) getApplication()).getAppCommponent().inject(this);
 
+        final ApiService apiService = retrofit.create(ApiService.class);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        final Observable<MovieResponse> movie = apiService.getPopularMovies(BuildConfig.BASE_KEY);
 
+        movie.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<MovieResponse>() {
+                    @Override
+                    public void onCompleted() {
+                        progressBar.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(MovieResponse movieResponse) {
+                        progressBar.setVisibility(View.VISIBLE);
+                        movies = movieResponse.getResults();
+                        adapter = new MovieAdapter(movies, R.layout.list_item_movies, MainActivity.this);
+                        adapter.setClickListener(MainActivity.this);
+                        recyclerView.setAdapter(adapter);
+                    }
+                });
+    }
+
+    public void ViewTopRatedMovies(){
+        ((App) getApplication()).getAppCommponent().inject(this);
 
         final ApiService apiService = retrofit.create(ApiService.class);
 
@@ -93,5 +130,28 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         Intent detail = new Intent(this, DetailActivity.class);
         detail.putExtra("id", movies.get(position).getId());
         startActivity(detail);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.option_menu, menu); //your file name
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.popular:
+                Log.i(TAG, "Popular Movies");
+                ViewPopularMovies();
+                return true;
+            case R.id.toprated:
+                Log.i(TAG, "Top Rated Movies");
+                ViewTopRatedMovies();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
